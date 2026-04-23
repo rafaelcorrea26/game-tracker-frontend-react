@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { api } from "@/services/api"
 import type { Game } from "@/types/Game"
 
@@ -19,6 +19,9 @@ type GameStatus = "playing" | "completed" | "backlog"
 type FilterStatus = "all" | GameStatus
 
 type GamesProps = {
+  games: Game[]
+  loading: boolean
+  onRefreshGames: () => Promise<void>
   onNavigate: (tab: AppTab) => void
   onLogout: () => void
 }
@@ -83,7 +86,7 @@ type StatusSelectorProps = {
 
 function StatusSelector({ value, onChange }: StatusSelectorProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
       {STATUS_OPTIONS.map((option) => {
         const isActive = value === option.value
 
@@ -129,19 +132,24 @@ function StatCard({
         active ? "ring-2 ring-slate-900" : ""
       }`}
     >
-      <div className="p-6">
+      <div className="p-5 sm:p-6">
         <p className="text-sm font-medium text-slate-500">{title}</p>
-        <p className={`mt-2 text-3xl font-bold ${accentClassName}`}>{value}</p>
+        <p className={`mt-2 text-2xl font-bold sm:text-3xl ${accentClassName}`}>
+          {value}
+        </p>
       </div>
     </button>
   )
 }
 
-export default function Games({ onNavigate, onLogout }: GamesProps) {
+export default function Games({
+  games,
+  loading,
+  onRefreshGames,
+  onNavigate,
+  onLogout,
+}: GamesProps) {
   const currentYear = new Date().getFullYear()
-
-  const [games, setGames] = useState<Game[]>([])
-  const [loading, setLoading] = useState(true)
 
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -170,23 +178,6 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
   const [search, setSearch] = useState("")
 
   const { toast } = useToast()
-
-  const loadGames = async () => {
-    try {
-      const data = await api<Game[]>("/games")
-      setGames(Array.isArray(data) ? data : [])
-    } catch (err) {
-      console.error(err)
-      setGames([])
-      toast({
-        title: "Erro",
-        description: "Não foi possível carregar os jogos",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const resetCreateForm = () => {
     setCreateName("")
@@ -217,9 +208,10 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
         notes: createNotes,
       }
 
-      const newGame = await api<Game, CreateGameBody>("/games", "POST", payload)
+      await api<Game, CreateGameBody>("/games", "POST", payload)
 
-      setGames((prev) => [newGame, ...prev])
+      await onRefreshGames()
+
       resetCreateForm()
       setOpen(false)
 
@@ -280,15 +272,9 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
         notes: editNotes,
       }
 
-      const updatedGame = await api<Game, UpdateGameBody>(
-        `/games/${editingId}`,
-        "PUT",
-        payload
-      )
+      await api<Game, UpdateGameBody>(`/games/${editingId}`, "PUT", payload)
 
-      setGames((prev) =>
-        prev.map((game) => (game.id === updatedGame.id ? updatedGame : game))
-      )
+      await onRefreshGames()
 
       setEditOpen(false)
       setEditingId(null)
@@ -322,7 +308,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
       setDeleting(true)
 
       await api<void>(`/games/${deletingId}`, "DELETE")
-      setGames((prev) => prev.filter((g) => g.id !== deletingId))
+      await onRefreshGames()
 
       setDeleteOpen(false)
       setDeletingId(null)
@@ -343,10 +329,6 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
       setDeleting(false)
     }
   }
-
-  useEffect(() => {
-    loadGames()
-  }, [])
 
   const stats = useMemo(() => {
     return {
@@ -382,7 +364,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
         onLogout={onLogout}
       >
         <div className="animate-pulse space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="h-28 rounded-xl bg-slate-200" />
             <div className="h-28 rounded-xl bg-slate-200" />
             <div className="h-28 rounded-xl bg-slate-200" />
@@ -402,7 +384,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
       onLogout={onLogout}
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-end">
+        <div className="flex justify-end">
           <Dialog
             open={open}
             onOpenChange={(value) => {
@@ -411,10 +393,10 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
             }}
           >
             <DialogTrigger>
-              <Button className="shadow-sm">Novo jogo</Button>
+              <Button className="w-full sm:w-auto shadow-sm">Novo jogo</Button>
             </DialogTrigger>
 
-            <DialogContent className="max-w-md bg-white opacity-100 shadow-2xl">
+            <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto bg-white shadow-2xl">
               <DialogHeader>
                 <DialogTitle>Novo jogo</DialogTitle>
               </DialogHeader>
@@ -441,7 +423,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-slate-700">
                       Ano de conclusão
@@ -491,7 +473,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
           </Dialog>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             title="Todos"
             value={stats.total}
@@ -524,10 +506,10 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
 
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-4">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex flex-col gap-4">
               <CardTitle className="text-lg">Sua biblioteca</CardTitle>
 
-              <div className="flex flex-col gap-3 md:w-[320px]">
+              <div className="w-full">
                 <Input
                   placeholder="Buscar por nome ou observações"
                   value={search}
@@ -539,7 +521,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
 
           <CardContent className="space-y-4">
             {filteredGames.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
+              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center sm:p-10">
                 <p className="text-base font-medium text-slate-700">
                   Nenhum jogo encontrado
                 </p>
@@ -552,47 +534,51 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
                 {filteredGames.map((game) => (
                   <div
                     key={game.id}
-                    className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 transition hover:shadow-sm md:flex-row md:items-center md:justify-between"
+                    className="rounded-xl border border-slate-200 bg-white p-4 transition hover:shadow-sm"
                   >
-                    <div className="min-w-0 space-y-2">
-                      <div className="flex items-center gap-3">
-                        <p className="truncate text-base font-semibold text-slate-900">
-                          {game.name}
-                        </p>
-                        <span
-                          className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${getStatusClasses(
-                            game.status
-                          )}`}
+                    <div className="flex flex-col gap-4">
+                      <div className="min-w-0 space-y-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                          <p className="truncate text-base font-semibold text-slate-900">
+                            {game.name}
+                          </p>
+                          <span
+                            className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-medium ${getStatusClasses(
+                              game.status
+                            )}`}
+                          >
+                            {getStatusLabel(game.status)}
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col gap-1 text-sm text-slate-500 sm:flex-row sm:flex-wrap sm:gap-4">
+                          <span>Nota: {game.rating ?? 0}</span>
+                          <span>Ano: {game.year_completed ?? "-"}</span>
+                          <span className="break-words">
+                            {game.notes?.trim()
+                              ? `Notas: ${game.notes}`
+                              : "Sem observações"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+                        <Button
+                          variant="outline"
+                          className="w-full sm:w-auto"
+                          onClick={() => openEditModal(game)}
                         >
-                          {getStatusLabel(game.status)}
-                        </span>
+                          Editar
+                        </Button>
+
+                        <Button
+                          variant="destructive"
+                          className="w-full sm:w-auto"
+                          onClick={() => openDeleteModal(game)}
+                        >
+                          Deletar
+                        </Button>
                       </div>
-
-                      <div className="flex flex-wrap gap-4 text-sm text-slate-500">
-                        <span>Nota: {game.rating ?? 0}</span>
-                        <span>Ano: {game.year_completed ?? "-"}</span>
-                        <span>
-                          {game.notes?.trim()
-                            ? `Observação: ${game.notes}`
-                            : "Sem observações"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => openEditModal(game)}
-                      >
-                        Editar
-                      </Button>
-
-                      <Button
-                        variant="destructive"
-                        onClick={() => openDeleteModal(game)}
-                      >
-                        Deletar
-                      </Button>
                     </div>
                   </div>
                 ))}
@@ -602,7 +588,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
         </Card>
 
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="max-w-md bg-white opacity-100 shadow-2xl">
+          <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto bg-white shadow-2xl">
             <DialogHeader>
               <DialogTitle>Editar jogo</DialogTitle>
             </DialogHeader>
@@ -626,7 +612,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
                 <StatusSelector value={editStatus} onChange={setEditStatus} />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700">
                     Ano de conclusão
@@ -676,7 +662,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
         </Dialog>
 
         <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-          <DialogContent className="max-w-sm bg-white opacity-100 shadow-2xl">
+          <DialogContent className="max-w-sm bg-white shadow-2xl">
             <DialogHeader>
               <DialogTitle>Excluir jogo</DialogTitle>
             </DialogHeader>
@@ -690,11 +676,12 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
                 ? Essa ação não pode ser desfeita.
               </p>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                 <Button
                   variant="outline"
                   onClick={() => setDeleteOpen(false)}
                   disabled={deleting}
+                  className="w-full sm:w-auto"
                 >
                   Cancelar
                 </Button>
@@ -703,6 +690,7 @@ export default function Games({ onNavigate, onLogout }: GamesProps) {
                   variant="destructive"
                   onClick={confirmDeleteGame}
                   disabled={deleting}
+                  className="w-full sm:w-auto"
                 >
                   {deleting ? "Excluindo..." : "Excluir"}
                 </Button>

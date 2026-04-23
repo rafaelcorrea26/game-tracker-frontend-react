@@ -10,29 +10,46 @@ import Settings from "./pages/Settings"
 import type { AppTab } from "@/components/layout/AppShell"
 
 export default function App() {
-  const token = localStorage.getItem("token")
+  const [token] = useState<string | null>(() => localStorage.getItem("token"))
   const [activeTab, setActiveTab] = useState<AppTab>("dashboard")
   const [games, setGames] = useState<Game[]>([])
+  const [loadingGames, setLoadingGames] = useState(false)
 
   useEffect(() => {
     if (!token) return
 
     const loadGames = async () => {
       try {
+        setLoadingGames(true)
         const data = await api<Game[]>("/games")
         setGames(Array.isArray(data) ? data : [])
       } catch (err) {
         console.error(err)
         setGames([])
+      } finally {
+        setLoadingGames(false)
       }
     }
 
-    loadGames()
+    void loadGames()
   }, [token])
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     window.location.reload()
+  }
+
+  const refreshGames = async () => {
+    try {
+      setLoadingGames(true)
+      const data = await api<Game[]>("/games")
+      setGames(Array.isArray(data) ? data : [])
+    } catch (err) {
+      console.error(err)
+      setGames([])
+    } finally {
+      setLoadingGames(false)
+    }
   }
 
   if (!token) {
@@ -69,6 +86,9 @@ export default function App() {
 
   return (
     <Games
+      games={games}
+      loading={loadingGames}
+      onRefreshGames={refreshGames}
       onNavigate={setActiveTab}
       onLogout={handleLogout}
     />

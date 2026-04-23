@@ -24,19 +24,12 @@ export default function Assistant({
 
     const userMessage = message
 
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: userMessage },
-    ])
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
 
     setMessage("")
     setLoading(true)
 
     try {
-      // =========================
-      // 🤖 MOCK LOCAL (SEM IA)
-      // =========================
-
       let response = "Não entendi, tente algo como: 'quais jogos estou jogando?'"
 
       if (userMessage.toLowerCase().includes("jogando")) {
@@ -49,26 +42,7 @@ export default function Assistant({
         response = "Para adicionar um jogo, clique em 'Novo jogo' 🎯"
       }
 
-      // =========================
-      // 🔥 IA REAL (DESATIVADA)
-      // =========================
-      /*
-      const res = await fetch("http://localhost:5000", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: userMessage }),
-      })
-
-      const data = await res.json()
-      response = data.response || "Sem resposta da IA"
-      */
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: response },
-      ])
+      setMessages((prev) => [...prev, { role: "assistant", content: response }])
     } catch (err) {
       console.error(err)
 
@@ -113,10 +87,10 @@ export default function Assistant({
                 messages.map((item, index) => (
                   <div
                     key={`${item.role}-${index}`}
-                    className={`max-w-[80%] rounded-xl px-4 py-3 text-sm ${
+                    className={`max-w-[90%] rounded-xl px-4 py-3 text-sm sm:max-w-[80%] ${
                       item.role === "user"
                         ? "ml-auto bg-slate-900 text-white"
-                        : "bg-white text-slate-800 border"
+                        : "border bg-white text-slate-800"
                     }`}
                   >
                     {item.content}
@@ -125,14 +99,18 @@ export default function Assistant({
               )}
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <Input
                 placeholder="Digite sua mensagem"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
 
-              <Button onClick={sendMessage} disabled={loading}>
+              <Button
+                onClick={sendMessage}
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
                 {loading ? "Enviando..." : "Enviar"}
               </Button>
             </div>

@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import type { Game } from "@/types/Game"
 import AppShell, { type AppTab } from "@/components/layout/AppShell"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 
 type DashboardProps = {
   games: Game[]
@@ -23,18 +24,12 @@ export default function Dashboard({
     const avgRating =
       games.length > 0
         ? (
-            games.reduce((acc, g) => acc + (g.rating ?? 0), 0) /
-            games.length
+            games.reduce((acc, g) => acc + (g.rating ?? 0), 0) / games.length
           ).toFixed(1)
         : "0.0"
 
-    const lastCompleted = games
-      .filter((g) => g.status === "completed")
-      .slice(0, 3)
-
-    const lastPlaying = games
-      .filter((g) => g.status === "playing")
-      .slice(0, 3)
+    const lastCompleted = games.filter((g) => g.status === "completed").slice(0, 3)
+    const lastPlaying = games.filter((g) => g.status === "playing").slice(0, 3)
 
     return {
       total,
@@ -55,52 +50,52 @@ export default function Dashboard({
       onLogout={onLogout}
     >
       <div className="space-y-6">
-        {/* 📊 KPIs */}
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <p className="text-sm text-slate-500">Total</p>
-              <p className="text-3xl font-bold">{stats.total}</p>
+              <p className="text-2xl font-bold sm:text-3xl">{stats.total}</p>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <p className="text-sm text-slate-500">Jogando</p>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-blue-600 sm:text-3xl">
                 {stats.playing}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <p className="text-sm text-slate-500">Zerados</p>
-              <p className="text-3xl font-bold text-emerald-600">
+              <p className="text-2xl font-bold text-emerald-600 sm:text-3xl">
                 {stats.completed}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <p className="text-sm text-slate-500">Backlog</p>
-              <p className="text-3xl font-bold text-amber-600">
+              <p className="text-2xl font-bold text-amber-600 sm:text-3xl">
                 {stats.backlog}
               </p>
             </CardContent>
           </Card>
 
           <Card className="border-0 shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-5 sm:p-6">
               <p className="text-sm text-slate-500">Média</p>
-              <p className="text-3xl font-bold">{stats.avgRating}</p>
+              <p className="text-2xl font-bold sm:text-3xl">
+                {stats.avgRating}
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* 🎮 Seções separadas */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2">
           <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle>Jogando agora</CardTitle>
@@ -114,9 +109,9 @@ export default function Dashboard({
                 stats.lastPlaying.map((game) => (
                   <div
                     key={game.id}
-                    className="rounded-lg border p-3"
+                    className="rounded-lg border border-slate-200 p-4"
                   >
-                    <p className="font-medium">{game.name}</p>
+                    <p className="font-medium text-slate-900">{game.name}</p>
                     <p className="text-sm text-slate-500">
                       Nota: {game.rating ?? 0}
                     </p>
@@ -139,9 +134,9 @@ export default function Dashboard({
                 stats.lastCompleted.map((game) => (
                   <div
                     key={game.id}
-                    className="rounded-lg border p-3"
+                    className="rounded-lg border border-slate-200 p-4"
                   >
-                    <p className="font-medium">{game.name}</p>
+                    <p className="font-medium text-slate-900">{game.name}</p>
                     <p className="text-sm text-slate-500">
                       Nota: {game.rating ?? 0}
                     </p>
@@ -152,24 +147,20 @@ export default function Dashboard({
           </Card>
         </div>
 
-        {/* 🚀 CTA */}
         <Card className="border-0 shadow-sm">
-          <CardContent className="flex items-center justify-between p-6">
+          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div>
-              <p className="font-semibold">
+              <p className="font-semibold text-slate-900">
                 Quer gerenciar seus jogos?
               </p>
               <p className="text-sm text-slate-500">
-                Vá para a aba de jogos para editar e adicionar novos
+                Vá para a aba de jogos para editar, filtrar e adicionar novos.
               </p>
             </div>
 
-            <button
-              onClick={() => onNavigate("games")}
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white"
-            >
+            <Button onClick={() => onNavigate("games")} className="w-full sm:w-auto">
               Ir para jogos
-            </button>
+            </Button>
           </CardContent>
         </Card>
       </div>

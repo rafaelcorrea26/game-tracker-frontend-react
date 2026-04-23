@@ -132,7 +132,11 @@ export default function Settings({
               </div>
             ) : null}
 
-            <Button onClick={handleChangePassword} disabled={loading}>
+            <Button
+              onClick={handleChangePassword}
+              disabled={loading}
+              className="w-full sm:w-auto"
+            >
               {loading ? "Salvando..." : "Salvar nova senha"}
             </Button>
           </CardContent>
