@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:8080"
+const BASE_URL = import.meta.env.VITE_API_URL
 
 export async function api<T, B = unknown>(
   path: string,
@@ -19,7 +19,16 @@ export async function api<T, B = unknown>(
   })
 
   if (!res.ok) {
-    throw new Error("Erro na requisição")
+    let message = "Erro na requisição"
+
+    try {
+      const errorBody = (await res.json()) as { error?: string }
+      if (errorBody?.error) {
+        message = errorBody.error
+      }
+    } catch {}
+
+    throw new Error(message)
   }
 
   return res.json()
