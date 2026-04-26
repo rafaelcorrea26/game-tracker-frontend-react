@@ -3,7 +3,7 @@ import { api } from "@/services/api"
 import type { Game } from "@/types/Game"
 
 import Login from "./pages/Login"
-import Games from "./pages/Games"
+import Games from "./pages/games/Games"
 import Dashboard from "./pages/Dashboard"
 import Assistant from "./pages/Assistant"
 import Settings from "./pages/Settings"

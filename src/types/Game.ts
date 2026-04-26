@@ -5,4 +5,5 @@ export type Game = {
   year_completed?: number
   rating?: number
   notes?: string
+  platform?: string
 }
