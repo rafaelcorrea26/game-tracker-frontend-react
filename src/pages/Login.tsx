@@ -13,13 +13,36 @@ type AuthBody = {
   password: string
 }
 
+const SAVED_USER_KEY = "gt_saved_user"
+const SAVED_PASS_KEY = "gt_saved_pass"
+
+function loadSaved() {
+  const u = localStorage.getItem(SAVED_USER_KEY) ?? ""
+  const p = localStorage.getItem(SAVED_PASS_KEY)
+  return { username: u, password: p ? atob(p) : "" }
+}
+
 export default function Login() {
+  const hasSaved = !!localStorage.getItem(SAVED_USER_KEY)
+  const saved = hasSaved ? loadSaved() : { username: "", password: "" }
+
   const [isLogin, setIsLogin] = useState(true)
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState(saved.username)
+  const [password, setPassword] = useState(saved.password)
+  const [remember, setRemember] = useState(hasSaved)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+
+  const persistCredentials = (u: string, p: string) => {
+    localStorage.setItem(SAVED_USER_KEY, u)
+    localStorage.setItem(SAVED_PASS_KEY, btoa(p))
+  }
+
+  const clearCredentials = () => {
+    localStorage.removeItem(SAVED_USER_KEY)
+    localStorage.removeItem(SAVED_PASS_KEY)
+  }
 
   const handleSubmit = async () => {
     setError("")
@@ -38,6 +61,12 @@ export default function Login() {
           username,
           password,
         })
+
+        if (remember) {
+          persistCredentials(username, password)
+        } else {
+          clearCredentials()
+        }
 
         localStorage.setItem("token", response.token)
         window.location.reload()
@@ -100,6 +129,21 @@ export default function Login() {
             />
           </div>
 
+          {isLogin && (
+            <label className="flex cursor-pointer items-center gap-2.5">
+              <input
+                type="checkbox"
+                checked={remember}
+                onChange={(e) => {
+                  setRemember(e.target.checked)
+                  if (!e.target.checked) clearCredentials()
+                }}
+                className="h-4 w-4 rounded border-slate-300 accent-slate-900"
+              />
+              <span className="text-sm text-slate-600">Lembrar credenciais</span>
+            </label>
+          )}
+
           {error ? (
             <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {error}
@@ -112,7 +156,11 @@ export default function Login() {
             </div>
           ) : null}
 
-          <Button onClick={handleSubmit} disabled={loading} className="w-full">
+          <Button
+            onClick={() => void handleSubmit()}
+            disabled={loading}
+            className="w-full"
+          >
             {loading ? "Carregando..." : isLogin ? "Entrar" : "Cadastrar"}
           </Button>
 
