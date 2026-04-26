@@ -83,10 +83,9 @@ export default function AppShell({
                 </h2>
               </div>
 
-              {/* Sair visível apenas no desktop — sidebar já tem o botão */}
               <Button
                 variant="outline"
-                className="hidden lg:inline-flex"
+                className="inline-flex"
                 onClick={onLogout}
               >
                 Sair
