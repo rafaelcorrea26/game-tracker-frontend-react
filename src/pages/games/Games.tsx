@@ -292,8 +292,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
               </CardTitle>
 
               <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (v) resetCreate() }}>
-                <DialogTrigger asChild>
-                  <Button size="sm">+ Novo jogo</Button>
+                <DialogTrigger render={<Button size="sm" />}>
+                  + Novo jogo
                 </DialogTrigger>
                 <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto bg-white shadow-2xl">
                   <DialogHeader><DialogTitle>Novo jogo</DialogTitle></DialogHeader>
