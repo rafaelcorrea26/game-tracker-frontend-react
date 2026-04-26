@@ -364,7 +364,7 @@ export default function Games({
         onLogout={onLogout}
       >
         <div className="animate-pulse space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
             <div className="h-28 rounded-xl bg-slate-200" />
             <div className="h-28 rounded-xl bg-slate-200" />
             <div className="h-28 rounded-xl bg-slate-200" />
@@ -457,7 +457,7 @@ export default function Games({
                     placeholder="Escreva observações sobre o jogo..."
                     value={createNotes}
                     onChange={(e) => setCreateNotes(e.target.value)}
-                    className="min-h-[110px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400"
+                    className="min-h-[110px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 shadow-sm outline-none focus:border-slate-400 md:text-sm"
                   />
                 </div>
 
@@ -473,7 +473,7 @@ export default function Games({
           </Dialog>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
           <StatCard
             title="Todos"
             value={stats.total}
@@ -646,7 +646,7 @@ export default function Games({
                   placeholder="Escreva um resumo da experiência, progresso ou observações..."
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
-                  className="min-h-[110px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none focus:border-slate-400"
+                  className="min-h-[110px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 shadow-sm outline-none focus:border-slate-400 md:text-sm"
                 />
               </div>
 

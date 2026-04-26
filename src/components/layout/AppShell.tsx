@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react"
+import { type ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 
 export type AppTab = "dashboard" | "games" | "assistant" | "settings"
@@ -11,11 +11,16 @@ type AppShellProps = {
   children: ReactNode
 }
 
-const items: { key: AppTab; label: string; icon: string }[] = [
-  { key: "dashboard", label: "Dashboard", icon: "📊" },
-  { key: "games", label: "Jogos", icon: "🎮" },
-  { key: "assistant", label: "Assistente IA", icon: "🤖" },
-  { key: "settings", label: "Configurações", icon: "⚙️" },
+const navItems: {
+  key: AppTab
+  label: string
+  mobileLabel: string
+  icon: string
+}[] = [
+  { key: "dashboard", label: "Dashboard", mobileLabel: "Dashboard", icon: "📊" },
+  { key: "games", label: "Jogos", mobileLabel: "Jogos", icon: "🎮" },
+  { key: "assistant", label: "Assistente IA", mobileLabel: "Assistente", icon: "🤖" },
+  { key: "settings", label: "Configurações", mobileLabel: "Config", icon: "⚙️" },
 ]
 
 export default function AppShell({
@@ -25,16 +30,10 @@ export default function AppShell({
   onLogout,
   children,
 }: AppShellProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const handleNavigate = (tab: AppTab) => {
-    onNavigate(tab)
-    setMobileMenuOpen(false)
-  }
-
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="flex min-h-screen">
+        {/* Sidebar desktop */}
         <aside className="hidden w-72 border-r bg-white lg:flex lg:flex-col">
           <div className="border-b px-6 py-6">
             <p className="text-sm font-medium text-slate-500">Workspace</p>
@@ -44,14 +43,13 @@ export default function AppShell({
           </div>
 
           <nav className="flex-1 space-y-2 p-4">
-            {items.map((item) => {
+            {navItems.map((item) => {
               const active = activeTab === item.key
-
               return (
                 <button
                   key={item.key}
                   type="button"
-                  onClick={() => handleNavigate(item.key)}
+                  onClick={() => onNavigate(item.key)}
                   className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition ${
                     active
                       ? "bg-slate-900 text-white"
@@ -72,6 +70,7 @@ export default function AppShell({
           </div>
         </aside>
 
+        {/* Conteúdo principal */}
         <main className="flex-1">
           <header className="sticky top-0 z-30 border-b bg-white/95 backdrop-blur">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
@@ -84,51 +83,60 @@ export default function AppShell({
                 </h2>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="lg:hidden"
-                  onClick={() => setMobileMenuOpen((prev) => !prev)}
-                >
-                  {mobileMenuOpen ? "Fechar" : "Menu"}
-                </Button>
-
-                <Button variant="outline" onClick={onLogout}>
-                  Sair
-                </Button>
-              </div>
+              {/* Sair visível apenas no desktop — sidebar já tem o botão */}
+              <Button
+                variant="outline"
+                className="hidden lg:inline-flex"
+                onClick={onLogout}
+              >
+                Sair
+              </Button>
             </div>
-
-            {mobileMenuOpen ? (
-              <div className="border-t bg-white px-4 py-3 lg:hidden">
-                <div className="grid gap-2">
-                  {items.map((item) => {
-                    const active = activeTab === item.key
-
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => handleNavigate(item.key)}
-                        className={`flex items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium transition ${
-                          active
-                            ? "bg-slate-900 text-white"
-                            : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                        }`}
-                      >
-                        <span>{item.icon}</span>
-                        <span>{item.label}</span>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ) : null}
           </header>
 
-          <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">{children}</div>
+          {/* pb-24 no mobile para não ficar atrás da bottom nav */}
+          <div className="mx-auto max-w-7xl px-4 pb-24 pt-6 sm:px-6 lg:pb-8">
+            {children}
+          </div>
         </main>
       </div>
+
+      {/* Bottom navigation — mobile only */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white lg:hidden"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+      >
+        <div className="grid grid-cols-4">
+          {navItems.map((item) => {
+            const active = activeTab === item.key
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => onNavigate(item.key)}
+                className="flex flex-col items-center gap-1 py-2 transition"
+              >
+                <span
+                  className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg transition ${
+                    active ? "bg-slate-900 text-white" : "text-slate-400"
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                <span
+                  className={`text-[11px] leading-none ${
+                    active
+                      ? "font-semibold text-slate-900"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {item.mobileLabel}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </nav>
     </div>
   )
 }

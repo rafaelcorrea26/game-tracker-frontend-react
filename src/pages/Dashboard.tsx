@@ -50,7 +50,7 @@ export default function Dashboard({
       onLogout={onLogout}
     >
       <div className="space-y-6">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
           <Card className="border-0 shadow-sm">
             <CardContent className="p-5 sm:p-6">
               <p className="text-sm text-slate-500">Total</p>

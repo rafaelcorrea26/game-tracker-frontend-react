@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import AppShell, { type AppTab } from "@/components/layout/AppShell"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,6 +18,11 @@ export default function Assistant({
   const [messages, setMessages] = useState<
     { role: "user" | "assistant"; content: string }[]
   >([])
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
 
   const sendMessage = async () => {
     if (!message.trim()) return
@@ -25,7 +30,6 @@ export default function Assistant({
     const userMessage = message
 
     setMessages((prev) => [...prev, { role: "user", content: userMessage }])
-
     setMessage("")
     setLoading(true)
 
@@ -45,17 +49,17 @@ export default function Assistant({
       setMessages((prev) => [...prev, { role: "assistant", content: response }])
     } catch (err) {
       console.error(err)
-
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: "Erro ao processar a mensagem.",
-        },
+        { role: "assistant", content: "Erro ao processar a mensagem." },
       ])
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !loading) void sendMessage()
   }
 
   return (
@@ -97,21 +101,24 @@ export default function Assistant({
                   </div>
                 ))
               )}
+              <div ref={bottomRef} />
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="flex gap-2">
               <Input
                 placeholder="Digite sua mensagem"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                className="flex-1"
               />
 
               <Button
-                onClick={sendMessage}
+                onClick={() => void sendMessage()}
                 disabled={loading}
-                className="w-full sm:w-auto"
+                className="shrink-0"
               >
-                {loading ? "Enviando..." : "Enviar"}
+                {loading ? "..." : "Enviar"}
               </Button>
             </div>
           </CardContent>

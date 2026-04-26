@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type KeyboardEvent } from "react"
 import { api } from "@/services/api"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -60,6 +60,10 @@ export default function Login() {
     }
   }
 
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter" && !loading) void handleSubmit()
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-8">
       <Card className="w-full max-w-md border-0 shadow-xl">
@@ -78,7 +82,9 @@ export default function Login() {
             <Input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Seu usuário"
+              autoComplete="username"
             />
           </div>
 
@@ -88,7 +94,9 @@ export default function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Sua senha"
+              autoComplete={isLogin ? "current-password" : "new-password"}
             />
           </div>
 
