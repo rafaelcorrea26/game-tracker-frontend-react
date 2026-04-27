@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { StatusSelector } from "./StatusSelector"
@@ -13,8 +14,10 @@ type Props = {
   setStatus: (v: GameStatus) => void
   platform: string
   setPlatform: (v: string) => void
-  yearCompleted: string
-  setYearCompleted: (v: string) => void
+  startDate: string
+  setStartDate: (v: string) => void
+  endDate: string
+  setEndDate: (v: string) => void
   rating: string
   setRating: (v: string) => void
   notes: string
@@ -28,7 +31,8 @@ export function GameForm({
   name, setName,
   status, setStatus,
   platform, setPlatform,
-  yearCompleted, setYearCompleted,
+  startDate, setStartDate,
+  endDate, setEndDate,
   rating, setRating,
   notes, setNotes,
   onSubmit,
@@ -38,6 +42,22 @@ export function GameForm({
   const handleGameSelect = (game: RawgResult) => {
     setName(game.name)
     if (game.platform) setPlatform(game.platform)
+  }
+
+  const dateError = useMemo(() => {
+    if (startDate && endDate && startDate > endDate)
+      return "A data de início não pode ser maior que a data de conclusão"
+    return null
+  }, [startDate, endDate])
+
+  const handleStartDateChange = (v: string) => {
+    setStartDate(v)
+    if (endDate && v && v > endDate) setEndDate("")
+  }
+
+  const handleEndDateChange = (v: string) => {
+    setEndDate(v)
+    if (startDate && v && v < startDate) setStartDate("")
   }
 
   return (
@@ -59,23 +79,38 @@ export function GameForm({
 
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Ano de conclusão</label>
+          <label className="text-sm font-medium text-slate-700">Data de início</label>
           <Input
-            type="number"
-            value={yearCompleted}
-            onChange={(e) => setYearCompleted(e.target.value)}
+            type="date"
+            value={startDate}
+            max={endDate || undefined}
+            onChange={(e) => handleStartDateChange(e.target.value)}
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Nota (0–10)</label>
+          <label className="text-sm font-medium text-slate-700">Data de conclusão</label>
           <Input
-            type="number"
-            min="0"
-            max="10"
-            value={rating}
-            onChange={(e) => setRating(e.target.value)}
+            type="date"
+            value={endDate}
+            min={startDate || undefined}
+            onChange={(e) => handleEndDateChange(e.target.value)}
           />
         </div>
+      </div>
+
+      {dateError && (
+        <p className="text-xs text-red-600">{dateError}</p>
+      )}
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-700">Nota (0–10)</label>
+        <Input
+          type="number"
+          min="0"
+          max="10"
+          value={rating}
+          onChange={(e) => setRating(e.target.value)}
+        />
       </div>
 
       <div className="space-y-2">
@@ -88,7 +123,7 @@ export function GameForm({
         />
       </div>
 
-      <Button onClick={onSubmit} disabled={submitting} className="w-full">
+      <Button onClick={onSubmit} disabled={submitting || !!dateError} className="w-full">
         {submitting ? "Salvando…" : submitLabel}
       </Button>
     </div>

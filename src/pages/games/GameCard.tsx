@@ -9,7 +9,15 @@ type Props = {
   onDelete: (game: Game) => void
 }
 
+function formatDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-")
+  return `${day}/${month}/${year}`
+}
+
 export function GameCard({ game, onEdit, onDelete }: Props) {
+  const hasStart = !!game.start_date
+  const hasEnd = !!game.end_date
+
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 transition hover:shadow-sm">
       {/* Plataforma + status */}
@@ -31,7 +39,19 @@ export function GameCard({ game, onEdit, onDelete }: Props) {
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-3 text-xs text-slate-500">
           {(game.rating ?? 0) > 0 && <span>⭐ {game.rating}/10</span>}
-          {(game.year_completed ?? 0) > 0 && <span>📅 {game.year_completed}</span>}
+          {hasStart && (
+            <span>
+              📅 {formatDate(game.start_date!)}
+              {" → "}
+              {hasEnd
+                ? formatDate(game.end_date!)
+                : <span className="text-blue-500 font-medium">Em andamento</span>
+              }
+            </span>
+          )}
+          {!hasStart && hasEnd && (
+            <span>🏁 {formatDate(game.end_date!)}</span>
+          )}
           {game.notes?.trim() && (
             <span className="max-w-[200px] truncate sm:max-w-xs">
               💬 {game.notes}

@@ -30,7 +30,7 @@ type Props = {
 }
 
 export default function Games({ games, loading, onRefreshGames, onNavigate, onLogout }: Props) {
-  const currentYear = new Date().getFullYear()
+  const today = new Date().toISOString().slice(0, 10)
   const { toast } = useToast()
 
   // ── Criar ──────────────────────────────────────────────────────────────────
@@ -39,7 +39,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
   const [createName, setCreateName] = useState("")
   const [createStatus, setCreateStatus] = useState<GameStatus>("playing")
   const [createPlatform, setCreatePlatform] = useState("")
-  const [createYear, setCreateYear] = useState(String(currentYear))
+  const [createStartDate, setCreateStartDate] = useState(today)
+  const [createEndDate, setCreateEndDate] = useState("")
   const [createRating, setCreateRating] = useState("10")
   const [createNotes, setCreateNotes] = useState("")
 
@@ -49,7 +50,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
   const [editName, setEditName] = useState("")
   const [editStatus, setEditStatus] = useState<GameStatus>("playing")
   const [editPlatform, setEditPlatform] = useState("")
-  const [editYear, setEditYear] = useState("")
+  const [editStartDate, setEditStartDate] = useState("")
+  const [editEndDate, setEditEndDate] = useState("")
   const [editRating, setEditRating] = useState("")
   const [editNotes, setEditNotes] = useState("")
   const [updating, setUpdating] = useState(false)
@@ -71,7 +73,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
     setCreateName("")
     setCreateStatus("playing")
     setCreatePlatform("")
-    setCreateYear(String(currentYear))
+    setCreateStartDate(today)
+    setCreateEndDate("")
     setCreateRating("10")
     setCreateNotes("")
   }
@@ -81,11 +84,16 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
       toast({ title: "Campo obrigatório", description: "Digite o nome do jogo", variant: "destructive" })
       return
     }
+    if (createStartDate && createEndDate && createStartDate > createEndDate) {
+      toast({ title: "Datas inválidas", description: "A data de início não pode ser maior que a de conclusão", variant: "destructive" })
+      return
+    }
     try {
       setSaving(true)
       await api<Game, GameBody>("/games", "POST", {
         name: createName, status: createStatus, platform: createPlatform,
-        year_completed: Number(createYear), rating: Number(createRating), notes: createNotes,
+        start_date: createStartDate, end_date: createEndDate,
+        rating: Number(createRating), notes: createNotes,
       })
       await onRefreshGames()
       resetCreate()
@@ -104,7 +112,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
     setEditName(game.name)
     setEditStatus((game.status as GameStatus) || "playing")
     setEditPlatform(game.platform ?? "")
-    setEditYear(game.year_completed ? String(game.year_completed) : "")
+    setEditStartDate(game.start_date ?? "")
+    setEditEndDate(game.end_date ?? "")
     setEditRating(game.rating != null ? String(game.rating) : "")
     setEditNotes(game.notes ?? "")
     setEditOpen(true)
@@ -115,11 +124,15 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
       toast({ title: "Campo obrigatório", description: "Digite o nome do jogo", variant: "destructive" })
       return
     }
+    if (editStartDate && editEndDate && editStartDate > editEndDate) {
+      toast({ title: "Datas inválidas", description: "A data de início não pode ser maior que a de conclusão", variant: "destructive" })
+      return
+    }
     try {
       setUpdating(true)
       await api<Game, GameBody>(`/games/${editingId}`, "PUT", {
         name: editName, status: editStatus, platform: editPlatform,
-        year_completed: editYear ? Number(editYear) : 0,
+        start_date: editStartDate, end_date: editEndDate,
         rating: editRating ? Number(editRating) : 0,
         notes: editNotes,
       })
@@ -188,7 +201,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
 
     if (sortBy === "name")   list = [...list].sort((a, b) => a.name.localeCompare(b.name, "pt"))
     if (sortBy === "rating") list = [...list].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0))
-    if (sortBy === "year")   list = [...list].sort((a, b) => (b.year_completed ?? 0) - (a.year_completed ?? 0))
+    if (sortBy === "date")   list = [...list].sort((a, b) => (b.end_date ?? b.start_date ?? "").localeCompare(a.end_date ?? a.start_date ?? ""))
 
     return list
   }, [games, filterStatus, filterPlatform, search, sortBy])
@@ -230,7 +243,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
             <option value="default">Ordem padrão</option>
             <option value="name">Nome (A–Z)</option>
             <option value="rating">Maior nota</option>
-            <option value="year">Ano (recente)</option>
+            <option value="date">Data (recente)</option>
           </select>
         </div>
 
@@ -301,7 +314,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
                     name={createName} setName={setCreateName}
                     status={createStatus} setStatus={setCreateStatus}
                     platform={createPlatform} setPlatform={setCreatePlatform}
-                    yearCompleted={createYear} setYearCompleted={setCreateYear}
+                    startDate={createStartDate} setStartDate={setCreateStartDate}
+                    endDate={createEndDate} setEndDate={setCreateEndDate}
                     rating={createRating} setRating={setCreateRating}
                     notes={createNotes} setNotes={setCreateNotes}
                     onSubmit={() => void createGame()}
@@ -337,7 +351,8 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
               name={editName} setName={setEditName}
               status={editStatus} setStatus={setEditStatus}
               platform={editPlatform} setPlatform={setEditPlatform}
-              yearCompleted={editYear} setYearCompleted={setEditYear}
+              startDate={editStartDate} setStartDate={setEditStartDate}
+              endDate={editEndDate} setEndDate={setEditEndDate}
               rating={editRating} setRating={setEditRating}
               notes={editNotes} setNotes={setEditNotes}
               onSubmit={() => void updateGame()}
