@@ -2,6 +2,8 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { StatusSelector } from "./StatusSelector"
 import { PlatformSelector } from "./PlatformSelector"
+import { GameSearch } from "./GameSearch"
+import type { RawgResult } from "@/services/rawg"
 import type { GameStatus } from "./types"
 
 type Props = {
@@ -33,15 +35,16 @@ export function GameForm({
   submitting,
   submitLabel,
 }: Props) {
+  const handleGameSelect = (game: RawgResult) => {
+    setName(game.name)
+    if (game.platform) setPlatform(game.platform)
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-700">Nome do jogo</label>
-        <Input
-          placeholder="Nome do jogo"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+        <GameSearch value={name} onChange={setName} onSelect={handleGameSelect} />
       </div>
 
       <div className="space-y-2">
