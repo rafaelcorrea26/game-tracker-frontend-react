@@ -12,6 +12,7 @@ export const KNOWN_PLATFORMS: PlatformConfig[] = [
   { value: "PS5",             label: "PS5",              icon: "🎮", badgeBg: "bg-blue-600",    badgeText: "text-white" },
   { value: "Xbox Series",     label: "Xbox Series",      icon: "🕹️", badgeBg: "bg-green-600",   badgeText: "text-white" },
   { value: "Nintendo Switch", label: "Switch",           icon: "🕹️", badgeBg: "bg-red-500",     badgeText: "text-white" },
+  { value: "Nintendo Switch 2", label: "Switch 2",       icon: "🕹️", badgeBg: "bg-red-400",     badgeText: "text-white" },
   // Geração anterior
   { value: "PS4",             label: "PS4",              icon: "🎮", badgeBg: "bg-blue-700",    badgeText: "text-white" },
   { value: "PS3",             label: "PS3",              icon: "🎮", badgeBg: "bg-blue-900",    badgeText: "text-white" },

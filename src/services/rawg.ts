@@ -21,6 +21,7 @@ const PLATFORM_MAP: Record<string, string> = {
   "xbox360":               "Xbox 360",
   "xbox":                  "Xbox",
   "nintendo-switch":       "Nintendo Switch",
+  "nintendo-switch-2":     "Nintendo Switch 2",
   "nintendo-3ds":          "Nintendo 3DS",
   "nintendo-ds":           "Nintendo DS",
   "nintendo-64":           "Nintendo 64",
