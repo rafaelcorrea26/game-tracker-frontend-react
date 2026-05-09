@@ -22,6 +22,8 @@ type Props = {
   setRating: (v: string) => void
   notes: string
   setNotes: (v: string) => void
+  imageUrl: string
+  setImageUrl: (v: string) => void
   onSubmit: () => void
   submitting: boolean
   submitLabel: string
@@ -35,6 +37,8 @@ export function GameForm({
   endDate, setEndDate,
   rating, setRating,
   notes, setNotes,
+  imageUrl: _imageUrl,
+  setImageUrl,
   onSubmit,
   submitting,
   submitLabel,
@@ -42,6 +46,7 @@ export function GameForm({
   const handleGameSelect = (game: RawgResult) => {
     setName(game.name)
     if (game.platform) setPlatform(game.platform)
+    if (game.image) setImageUrl(game.image)
   }
 
   const dateError = useMemo(() => {

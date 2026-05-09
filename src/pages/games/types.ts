@@ -10,4 +10,5 @@ export type GameBody = {
   rating: number
   notes: string
   platform: string
+  image_url: string
 }

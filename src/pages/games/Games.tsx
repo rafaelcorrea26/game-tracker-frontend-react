@@ -43,6 +43,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
   const [createEndDate, setCreateEndDate] = useState("")
   const [createRating, setCreateRating] = useState("10")
   const [createNotes, setCreateNotes] = useState("")
+  const [createImageUrl, setCreateImageUrl] = useState("")
 
   // ── Editar ─────────────────────────────────────────────────────────────────
   const [editOpen, setEditOpen] = useState(false)
@@ -54,6 +55,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
   const [editEndDate, setEditEndDate] = useState("")
   const [editRating, setEditRating] = useState("")
   const [editNotes, setEditNotes] = useState("")
+  const [editImageUrl, setEditImageUrl] = useState("")
   const [updating, setUpdating] = useState(false)
 
   // ── Deletar ────────────────────────────────────────────────────────────────
@@ -77,6 +79,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
     setCreateEndDate("")
     setCreateRating("10")
     setCreateNotes("")
+    setCreateImageUrl("")
   }
 
   const createGame = async () => {
@@ -94,6 +97,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
         name: createName, status: createStatus, platform: createPlatform,
         start_date: createStartDate, end_date: createEndDate,
         rating: Number(createRating), notes: createNotes,
+        image_url: createImageUrl,
       })
       await onRefreshGames()
       resetCreate()
@@ -116,6 +120,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
     setEditEndDate(game.end_date ?? "")
     setEditRating(game.rating != null ? String(game.rating) : "")
     setEditNotes(game.notes ?? "")
+    setEditImageUrl(game.image_url ?? "")
     setEditOpen(true)
   }
 
@@ -135,6 +140,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
         start_date: editStartDate, end_date: editEndDate,
         rating: editRating ? Number(editRating) : 0,
         notes: editNotes,
+        image_url: editImageUrl,
       })
       await onRefreshGames()
       setEditOpen(false)
@@ -318,6 +324,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
                     endDate={createEndDate} setEndDate={setCreateEndDate}
                     rating={createRating} setRating={setCreateRating}
                     notes={createNotes} setNotes={setCreateNotes}
+                    imageUrl={createImageUrl} setImageUrl={setCreateImageUrl}
                     onSubmit={() => void createGame()}
                     submitting={saving}
                     submitLabel="Adicionar jogo"
@@ -355,6 +362,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
               endDate={editEndDate} setEndDate={setEditEndDate}
               rating={editRating} setRating={setEditRating}
               notes={editNotes} setNotes={setEditNotes}
+              imageUrl={editImageUrl} setImageUrl={setEditImageUrl}
               onSubmit={() => void updateGame()}
               submitting={updating}
               submitLabel="Salvar alterações"

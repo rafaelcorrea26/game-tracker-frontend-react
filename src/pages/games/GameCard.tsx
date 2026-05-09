@@ -20,52 +20,70 @@ export function GameCard({ game, onEdit, onDelete }: Props) {
 
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 transition hover:shadow-sm">
-      {/* Plataforma + status */}
-      <div className="mb-1.5 flex flex-wrap items-center gap-2">
-        <PlatformBadge platform={game.platform} />
-        <span
-          className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getStatusClasses(game.status)}`}
-        >
-          {getStatusLabel(game.status)}
-        </span>
-      </div>
+      <div className="flex gap-3">
+        {/* Thumbnail 56×56 */}
+        {game.image_url ? (
+          <img
+            src={game.image_url}
+            alt=""
+            className="h-14 w-14 flex-shrink-0 rounded-lg object-cover object-center"
+            loading="lazy"
+          />
+        ) : (
+          <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xl">
+            🎮
+          </div>
+        )}
 
-      {/* Nome */}
-      <p className="truncate text-base font-semibold text-slate-900">
-        {game.name}
-      </p>
-
-      {/* Metadados + ações */}
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap gap-3 text-xs text-slate-500">
-          {(game.rating ?? 0) > 0 && <span>⭐ {game.rating}/10</span>}
-          {hasStart && (
-            <span>
-              📅 {formatDate(game.start_date!)}
-              {" → "}
-              {hasEnd
-                ? formatDate(game.end_date!)
-                : <span className="text-blue-500 font-medium">Em andamento</span>
-              }
+        <div className="min-w-0 flex-1">
+          {/* Plataforma + status */}
+          <div className="mb-1.5 flex flex-wrap items-center gap-2">
+            <PlatformBadge platform={game.platform} />
+            <span
+              className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getStatusClasses(game.status)}`}
+            >
+              {getStatusLabel(game.status)}
             </span>
-          )}
-          {!hasStart && hasEnd && (
-            <span>🏁 {formatDate(game.end_date!)}</span>
-          )}
-          {game.notes?.trim() && (
-            <span className="max-w-[200px] truncate sm:max-w-xs">
-              💬 {game.notes}
-            </span>
-          )}
-        </div>
+          </div>
 
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => onEdit(game)}>
-            Editar
-          </Button>
-          <Button variant="destructive" size="sm" onClick={() => onDelete(game)}>
-            Deletar
-          </Button>
+          {/* Nome */}
+          <p className="truncate text-base font-semibold text-slate-900">
+            {game.name}
+          </p>
+
+          {/* Metadados + ações */}
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap gap-3 text-xs text-slate-500">
+              {(game.rating ?? 0) > 0 && <span>⭐ {game.rating}/10</span>}
+              {hasStart && (
+                <span>
+                  📅 {formatDate(game.start_date!)}
+                  {" → "}
+                  {hasEnd
+                    ? formatDate(game.end_date!)
+                    : <span className="text-blue-500 font-medium">Em andamento</span>
+                  }
+                </span>
+              )}
+              {!hasStart && hasEnd && (
+                <span>🏁 {formatDate(game.end_date!)}</span>
+              )}
+              {game.notes?.trim() && (
+                <span className="max-w-[200px] truncate sm:max-w-xs">
+                  💬 {game.notes}
+                </span>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => onEdit(game)}>
+                Editar
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => onDelete(game)}>
+                Deletar
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
