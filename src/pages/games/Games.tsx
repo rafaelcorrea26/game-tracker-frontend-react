@@ -314,7 +314,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
                 <DialogTrigger render={<Button size="sm" />}>
                   + Novo jogo
                 </DialogTrigger>
-                <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto bg-white shadow-2xl">
+                <DialogContent className="max-h-[90vh] sm:max-w-md overflow-y-auto bg-white shadow-2xl">
                   <DialogHeader><DialogTitle>Novo jogo</DialogTitle></DialogHeader>
                   <GameForm
                     name={createName} setName={setCreateName}
@@ -352,7 +352,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
 
         {/* Modal editar */}
         <Dialog open={editOpen} onOpenChange={setEditOpen}>
-          <DialogContent className="max-h-[90vh] max-w-md overflow-y-auto bg-white shadow-2xl">
+          <DialogContent className="max-h-[90vh] sm:max-w-md overflow-y-auto bg-white shadow-2xl">
             <DialogHeader><DialogTitle>Editar jogo</DialogTitle></DialogHeader>
             <GameForm
               name={editName} setName={setEditName}
@@ -372,7 +372,7 @@ export default function Games({ games, loading, onRefreshGames, onNavigate, onLo
 
         {/* Modal deletar */}
         <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-          <DialogContent className="max-w-sm bg-white shadow-2xl">
+          <DialogContent className="bg-white shadow-2xl">
             <DialogHeader><DialogTitle>Excluir jogo</DialogTitle></DialogHeader>
             <div className="space-y-4">
               <p className="text-sm text-slate-600">

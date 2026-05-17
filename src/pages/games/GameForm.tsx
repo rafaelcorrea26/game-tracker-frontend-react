@@ -124,7 +124,7 @@ export function GameForm({
           placeholder="Escreva observações sobre o jogo…"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          className="min-h-[90px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 shadow-sm outline-none focus:border-slate-400 md:text-sm"
+          className="min-h-[90px] w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-base text-slate-900 shadow-sm outline-none focus:border-slate-400"
         />
       </div>
 

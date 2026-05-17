@@ -21,7 +21,7 @@ export function Toaster() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`min-w-[280px] rounded-lg px-4 py-3 shadow-lg text-white ${
+          className={`min-w-[200px] sm:min-w-[280px] rounded-lg px-4 py-3 shadow-lg text-white ${
             toast.variant === "destructive" ? "bg-red-500" : "bg-slate-900"
           }`}
         >
